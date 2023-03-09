@@ -167,103 +167,6 @@ def cost(out,nq):
 
 
 
-def main(nqMin,nqMax,n):
-    nMax = 20e4
-    
-    dx = np.arange(nqMin,nqMax)
-    
-    ########################################## Meta #######################
-    dz1 = []
-    for jj in range(1,n+1):
-        dy = []
-        for ni in range(nqMin,nqMax):
-
-            nl = ni
-            f = qlayer(ni,nl)
-            model = MetaLayer(f,ni,nl)
-            optimizer = optim.SGD(model.parameters(), lr=0.01)
-            x = torch.ones(ni)*(m.pi/4)
-
-            ex = 1
-            dn = 1
-            while ex>=0.001:
-                optimizer.zero_grad()
-
-                out = model(x)
-
-                l = cost(out,ni)
-                l.backward()
-
-                optimizer.step()
-
-                ex = l.item()
-                if dn%100==0:
-                    print('Meta','n:',jj ,'nq:' , ni,':', dn ,'out:', l.item())
-
-                if dn>=nMax:
-                    ex = 0.0
-                    dn = 0
-                    break
-                else:
-                    dn+=1
-
-
-            #dx.append(ni)
-            dy.append(dn)
-            del model
-        dz1.append(dy)
-
-    dz1 = np.array(dz1)
-    np.savetxt('numMeta2_nq_igual_nl.txt',dz1)
-
-    ########################################## net #######################
-    dz = []
-    for jj in range(1,n+1):
-        dy = []
-        for ni in range(nqMin,nqMax):
-
-            nl = ni
-            f = qlayer(ni,nl)
-            model = Net(f,ni,nl)
-            optimizer = optim.SGD(model.parameters(), lr=0.01)
-            x = torch.ones(ni)*(m.pi/4)
-
-            ex = 1
-            dn = 1
-            while ex>=0.001:
-                optimizer.zero_grad()
-
-                out = model(x)
-
-                l = cost(out,ni)
-                l.backward()
-
-                optimizer.step()
-                
-                ex = l.item()
-                if dn%100==0:
-                    print('Net','n:',jj ,'nq:' , ni,':', dn  ,'out:', l.item())
-
-                if dn>=nMax:
-                    ex = 0.0
-                    dn = 0
-                    break
-                else:
-                    dn+=1
-
-
-
-            #dx.append(ni)
-            dy.append(dn)
-            del model
-        dz.append(dy)
-
-    dz = np.array(dz)
-
-
-    np.savetxt('numNet.txt',dz)
-
-
 def main_3(nqMin,nqMax,nl,n):
     nMax = 30e4
     Cost_ = 0.3
@@ -446,10 +349,6 @@ def main_3(nqMin,nqMax,nl,n):
 
 
 
-#main(nqMin,nqMax,n)
-
-#main(2,11,10)
-#main_3(nqMin,nqMax,nl,n)
 main_3(2,12,100,10)
 
 
